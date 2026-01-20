@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <zoomConfig>
+        <minScale>0.3</minScale>
+        <maxScale>3.0</maxScale>
+    </zoomConfig>
+    
+    <audio>
+        <backgroundMusic>audio/币币机.mp3</backgroundMusic>
+        <soundEffect>audio/click.mp3</soundEffect>
+        <specialSoundEffect>audio/我出货了.mp3</specialSoundEffect>
+    </audio>
+    
+    <info>
+        <version>0.4.0</version>
+        <groupNumber>457332319</groupNumber>
+        <bilibiliUrl>https://m.bilibili.com/space/3546967852452617</bilibiliUrl>
+    </info>
+    
+    <ui>
+        <gridWidth>400</gridWidth>
+        <gridHeight>333</gridHeight>
+        <safe>
+            <rows>5</rows>
+            <cols>6</cols>
+            <cellSize>60</cellSize>
+        </safe>
+        <items>
+            <itemBaseSize>80</itemBaseSize>
+            <itemScaleFactor>0.85</itemScaleFactor>
+            <itemBorderWidth>2</itemBorderWidth>
+            <itemPadding>4</itemPadding>
+            <itemFontSize>9</itemFontSize>
+            <itemSpacing>0</itemSpacing>
+            <itemWidthOffset>0</itemWidthOffset>
+            <itemImageEnabled>true</itemImageEnabled>
+            <itemImageBaseSize>32</itemImageBaseSize>
+            <itemImageScaleFactor>1</itemImageScaleFactor>
+        </items>
+    </ui>
+    
+    <rules>
+        <coin>
+            <positions>4</positions>
+            <chance1>100</chance1>
+            <chance2>80</chance2>
+            <chance3>60</chance3>
+            <chance4>0</chance4>
+            <minValue>1000</minValue>
+            <maxValue>2999</maxValue>
+        </coin>
+        
+        <spawn>
+            <redChance>0.5</redChance>
+            <orangeChance>5</orangeChance>
+            <goldChance>20</goldChance>
+            <purpleChance>30</purpleChance>
+            <whiteChance>44.5</whiteChance>
+        </spawn>
+        
+        <highQuality>
+            <minCount>2</minCount>
+            <maxCount>3</maxCount>
+        </highQuality>
+        
+        <totalItems>
+            <min>4</min>
+            <max>6</max>
+        </totalItems>
+    </rules>
+</config>
