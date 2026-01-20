@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>暗区突围保险箱模拟器 v0.4.0</title>
+    
+    <!-- 引入本地字体文件 -->
+    <style>
+        @font-face {
+            font-family: 'Segoe UI';
+            src: url('fonts/英文.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Microsoft YaHei';
+            src: url('fonts/国际中文.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+    </style>
+    
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 音频元素 -->
+    <audio id="open-safe-audio" preload="auto" style="display:none">
+        <source src="audio/open-safe.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 重置游戏音效 -->
+    <audio id="reset-game-audio" preload="auto" style="display:none">
+        <source src="audio/reset-game.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 点击音效 -->
+    <audio id="click-audio" preload="auto" style="display:none">
+        <source src="audio/click.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 背景音乐 -->
+    <audio id="background-music" preload="auto" loop style="display:none">
+        <source src="audio/币币机.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 出货音效（我出货了按钮使用） -->
+    <audio id="special-audio" preload="auto" style="display:none">
+        <source src="audio/我出货了.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 设置按钮 -->
+    <button class="settings-button" id="settings-button">
+        <i class="fas fa-cog"></i> 设置
+    </button>
+
+    <!-- 游戏容器 -->
+    <div class="game-container" id="game-container">
+        <!-- 顶部标题 -->
+        <div class="game-title">
+            <h1><i class="fas fa-vault"></i> 暗区突围保险箱模拟器 v0.4.0</h1>
+            <div style="font-size: 12px; color: var(--text-light); margin-top: 5px;">
+                网格大小: <span id="grid-size-info">5×6</span>
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 左侧面板 -->
+            <div class="left-panel">
+                <!-- 控制按钮 -->
+                <div class="control-section">
+                    <button id="open-safe-btn" class="btn btn-open">
+                        <i class="fas fa-check"></i> 打开保险箱
+                    </button>
+                    <button id="reset-btn" class="btn btn-reset">
+                        <i class="fas fa-redo"></i> 重置
+                    </button>
+                </div>
+
+                <!-- 音效按钮 -->
+                <div class="control-section">
+                    <button id="play-sound-btn" class="btn btn-sound">
+                        <i class="fas fa-volume-up"></i> 我出货了
+                    </button>
+                </div>
+
+                <!-- 游戏统计 -->
+                <div class="stats-section">
+                    <h3><i class="fas fa-chart-line"></i> 游戏统计</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">已搜索</div>
+                            <div class="stat-value" id="searched-count">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">总价值</div>
+                            <div class="stat-value" id="total-value">¥0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">最高价值</div>
+                            <div class="stat-value" id="highest-value">¥0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">总时间</div>
+                            <div class="stat-value" id="total-search-time">0s</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 搜索状态 -->
+                <div class="search-status">
+                    <h3><i class="fas fa-clock"></i> 搜索状态</h3>
+                    <div class="status-info">
+                        <div class="status-item">
+                            <span class="status-label">搜索进度：</span>
+                            <span class="status-value" id="search-progress">0/0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 中间面板 - 保险箱 -->
+            <div class="center-panel">
+                <div class="safe-section">
+                    <h3><i class="fas fa-box"></i> 保险箱(<span id="current-grid-size">6×5</span>)</h3>
+                    <div class="safe-container">
+                        <div class="safe-grid" id="safe-grid"></div>
+                    </div>
+                    <div class="grid-info" id="grid-info">点击"打开保险箱"按钮生成物品布局</div>
+                </div>
+            </div>
+
+            <!-- 右侧面板 - 已发现物品 -->
+            <div class="right-panel">
+                <div class="inventory-section">
+                    <h3><i class="fas fa-box-open"></i> 已发现物品</h3>
+                    <div class="inventory-container">
+                        <div class="inventory-list" id="inventory-list">
+                            <div class="inventory-empty">尚未发现任何物品</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 设置模态框 -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title"><i class="fas fa-cog"></i> 设置</div>
+                <button class="modal-close" id="settings-close">&times;</button>
+            </div>
+            <div class="settings-option">
+                <div class="settings-label">黑暗模式</div>
+                <label class="switch">
+                    <input type="checkbox" id="darkmode-toggle">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div class="settings-option">
+                <div class="settings-label">音效</div>
+                <label class="switch">
+                    <input type="checkbox" id="sound-toggle" checked>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div class="settings-option">
+                <div class="settings-label">背景音乐</div>
+                <label class="switch">
+                    <input type="checkbox" id="music-toggle" checked>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <button class="btn btn-open" id="bilibili-button" style="width: 100%; margin-top: 15px; padding: 8px 16px; font-size: 14px;">
+                <i class="fab fa-bilibili"></i> 作者B站主页
+            </button>
+            <button class="btn btn-open" id="credits-button" style="width: 100%; margin-top: 8px; padding: 8px 16px; font-size: 14px;">
+                <i class="fas fa-users"></i> 制作人员名单
+            </button>
+            <button class="btn btn-open" id="announcement-button" style="width: 100%; margin-top: 8px; padding: 8px 16px; font-size: 14px;">
+                <i class="fas fa-bullhorn"></i> 公告
+            </button>
+            <div class="version-info" id="version-info"></div>
+        </div>
+    </div>
+
+    <!-- 制作人员名单模态框 -->
+    <div class="modal-overlay" id="credits-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title"><i class="fas fa-users"></i> 制作人员名单</div>
+                <button class="modal-close" id="credits-close">&times;</button>
+            </div>
+            <ul class="credits-list">
+                <li class="credit-item">游戏设计：B站摸不到大金の盒饭</li>
+                <li class="credit-item">程序开发：摸不到大金の盒饭</li>
+                <li class="credit-item">界面设计：阿丽雅·伊莉白</li>
+                <li class="credit-item">测试：蛇彪</li>
+                <li class="credit-item">特别感谢：魔方工作室群</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 公告模态框 -->
+    <div class="modal-overlay" id="announcement-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title"><i class="fas fa-bullhorn"></i> 公告</div>
+                <button class="modal-close" id="announcement-close">&times;</button>
+            </div>
+            <div class="announcement-content">
+                <p>欢迎使用暗区突围保险箱模拟器 v0.4.0！</p>
+                <p><strong>更新内容：</strong></p>
+                <p>1. 修改了打开保险箱音效</p>                
+                <p>2. 新增了重置保险箱音效</p>
+                <p>3. 优化了页面字体</p>           
+                <p>4. 修复了若干BUG</p>
+                
+                <p><strong>配置说明：</strong></p>
+                <p>修改config.xml中的配置：</p>
+                <p>1. 网格配置：&lt;safe&gt;部分</p>
+                <p>2. 道具配置：&lt;items&gt;部分</p>
+                <p>3. 游戏规则：：&lt;rules&gt;部分</p>
+                  
+                <p><strong>注意事项：</strong></p>
+                <p>1. 请勿修改XML文件结构</p>
+                <p>2. 数值过大可能导致显示异常</p>
+                <p>3. 如遇问题请恢复默认配置</p>
+                <p>4. 建议备份原始配置文件</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="music.js"></script>
+    <link rel="stylesheet" href="music-player.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</body>
+</html>
